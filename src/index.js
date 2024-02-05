@@ -1,5 +1,6 @@
 const express=require("express");
 const path=require("path");
+const bcrypt=require("bcrypt")
 const app=express();
 //const hbs=require("hbs");
 const LogInCollection=require("./mongodb");
@@ -35,33 +36,60 @@ app.post("/signup",async (req,res)=>{
         password:req.body.password
     }
 
-    await LogInCollection.insertMany([data])
-  
-    res.render("home")
+    const existingUser = await LogInCollection.findOne({name: data.name});
+    
+    try{
+
+    if(existingUser) {
+        res.send("User already exists. Please choose a different Username.")
+    } else {
+        
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+
+        data.password = hashedPassword;
+
+        await LogInCollection.insertMany([data])  
+       }
+    } catch{
+        res.send("Wrong details")
+    }
+
+    res.status(201).render("home", { message: `Hello ${req.body.name}!` });
+
 });
 
+const now = new Date();
 
+const hour = now.getHours() + ':' + now.getMinutes();
+
+const loginTime = hour.toString();
 
 app.post('/login', async (req, res) => {
 
     try {
-        const check = await LogInCollection.findOne({ name: req.body.name })
-        console.log(check.password)
-        console.log(req.body)
-        if (check.password === req.body.password) {
-            res.status(201).render("home", { naming: `${req.body.password}${req.body.name}` })
+
+        const check = await LogInCollection.findOne({ name: req.body.name });
+
+        if (!check) {
+            res.send("User cannot be found")
         }
 
-        else {
+        const passwordMatch = await bcrypt.compare(req.body.password, check.password);
+
+        if (passwordMatch) {
+            res.status(201).render("home", { message: `Hello ${req.body.name}!`, time: `Login: ${loginTime}` });
+        } else {
             res.send("Incorrect password")
         }
+       
 
 
     } 
     
     catch (e) {
 
-        res.send("wrong details")
+        res.send("Wrong details")
         
 
     }
