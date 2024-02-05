@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "express": "^4.18.2",
+    "hbs": "^4.2.0",
+    "mongoose": "^8.1.1",
+    "nodemon": "^3.0.3"
+  },
+  "name": "mongooselisut",
+  "version": "1.0.0",
+  "description": "Mongoose Log In Sign Up",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marko",
+  "license": "ISC"
+}
