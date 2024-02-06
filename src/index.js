@@ -4,7 +4,10 @@ const bcrypt=require("bcrypt")
 const app=express();
 //const hbs=require("hbs");
 const LogInCollection=require("./mongodb");
+const loginTime=require("./script")
+
 const port = process.env.PORT || 3000;
+
 app.use(express.json());
 
 
@@ -28,6 +31,9 @@ app.get("/signup",(req,res)=>{
     res.render("signup");
 });
 
+app.get("/home", (req,res)=>{
+    res.render("home");
+}); 
 
 app.post("/signup",async (req,res)=>{
 
@@ -55,15 +61,10 @@ app.post("/signup",async (req,res)=>{
         res.send("Wrong details")
     }
 
-    res.status(201).render("home", { message: `Hello ${req.body.name}!` });
+    res.status(201).render("home", { message: `Welcome ${req.body.name}!` });
 
 });
 
-const now = new Date();
-
-const hour = now.getHours() + ':' + now.getMinutes();
-
-const loginTime = hour.toString();
 
 app.post('/login', async (req, res) => {
 
